@@ -29,8 +29,13 @@ body {
 }
 
 .trick .table .row .column {
+	border: 1px solid transparent;
 	padding: 10px;
 	position: relative;
+}
+
+.trick .table .row .column:hover {
+	border: 1px solid white;
 }
 
 .trick .table .row .column .card:nth-child(n+2) {
