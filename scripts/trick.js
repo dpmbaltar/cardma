@@ -1,39 +1,11 @@
 /**
  * JavaScript Cards Trick
- * By Diego P. M. Baltar http://dpmbaltar.com.ar/
+ * By Diego P. M. Baltar <dpmbaltar@gmail.com>
  * MIT Licensed.
  */
-if (typeof Object.keys == "undefined") {
-  Object.prototype.keys = function(object) {
-    var properties = new Array();
-
-    for (var property in object) {
-      if (object.propertyIsEnumerable(property)) {
-        properties.push(property);
-      }
-    }
-
-    return properties;
-  };
-}
-
-/*
-if (typeof Object.toArray == "undefined") {
-  Object.prototype.toArray = function() {
-    var array = new Array();
-
-    for (var property in this) {
-      if (this.propertyIsEnumerable(property)) {
-        array[property] = this[property];
-      }
-    }
-
-    return array;
-  };
-}*/
 
 /**
- * Card types.
+ * Card type.
  */
 var CardType = {
   CLUB:    "club",
@@ -43,7 +15,7 @@ var CardType = {
 };
 
 /**
- * Card values.
+ * Card value.
  */
 var CardValue = {
   ACE:   "ace",
@@ -81,48 +53,8 @@ var Card = Class.extend({
   _value: null,
 
   /**
-   * Returns the card type.
-   * @return {String}
-   */
-  getType: function() {
-    return this._type;
-  },
-
-  /**
-   * Returns the card value.
-   * @return {String}
-   */
-  getValue: function() {
-    return this._value;
-  },
-
-  /**
-   * Returns the DOM element representation of the card.
-   * @access private
-   * @return {DOMElement}
-   */
-  toDOMElement: function() {
-    var self = this, domElement;
-
-    domElement = document.createElement("div");
-    domElement.setAttribute("class", "card "+this._type+" "+this._value);
-    domElement.addEventListener("click", function() {
-      //alert(self.toString());
-    });
-
-    return domElement;
-  },
-
-  /**
-   * Returns the string representation of this card.
-   * @return {String}
-   */
-  toString: function() {
-    return "[Card "+this._type+" "+this._value+"]";
-  },
-
-  /**
    * The Card constructor.
+   * @access public
    * @param {String} type The card type.
    * @param {Number} value The card value.
    * @return {Card}
@@ -139,11 +71,52 @@ var Card = Class.extend({
 
     this._type = type.toLowerCase();
     this._value = value.toLowerCase();
+  },
+
+  /**
+   * Returns the card type.
+   * @access public
+   * @return {String}
+   */
+  getType: function() {
+    return this._type;
+  },
+
+  /**
+   * Returns the card value.
+   * @access public
+   * @return {String}
+   */
+  getValue: function() {
+    return this._value;
+  },
+
+  /**
+   * Returns the DOM element representation of the card.
+   * @access public
+   * @return {DOMElement}
+   */
+  toDOMElement: function() {
+    var cssClass, domElement;
+
+    cssClass = "card "+this._type+" "+this._value;
+    domElement = document.createElement("div");
+    domElement.setAttribute("class", cssClass);
+
+    return domElement;
+  },
+
+  /**
+   * Returns the string representation of the card.
+   * @return {String}
+   */
+  toString: function() {
+    return "[Card "+this._type+" "+this._value+"]";
   }
 });
 
 /**
- * Cards deck.
+ * Card deck.
  */
 var CardDeck = Class.extend({
 
@@ -155,30 +128,51 @@ var CardDeck = Class.extend({
   _deck: null,
 
   /**
-   * Indicates whether the specified card exists in this deck or not.
-   * @return {Boolean}
+   * The CardDeck constructor.
+   * @access public
+   * @param {Array} cards The initial cards for the deck.
+   * @return {CardDeck}
    */
-  contains: function(card) {
-    return this._deck.indexOf(card) != -1;
+  construct: function(cards) {
+    this._deck = new Array();
+
+    if (typeof cards != "undefined") {
+      try {
+        this.pushAll(cards);
+      } catch (error) {
+        console.log(error.message);
+      };
+    }
   },
 
   /**
-   * Indicates whether a card exists at the specified index.
+   * Indicates whether the specified card exists in the deck or not.
+   * @access public
+   * @return {Boolean}
+   */
+  contains: function(card) {
+    return (this._deck.indexOf(card) != -1);
+  },
+
+  /**
+   * Indicates whether the specified index maps to a card in the deck.
+   * @access public
    * @return {Boolean}
    * @throws {TypeError} If index is not a number.
    */
   containsAt: function(index) {
     index = new Number(index);
 
-    if (isNaN(index)) {
+    if (Number.isNaN(index)) {
       throw new TypeError("Invalid index type");
     }
 
-    return typeof this._deck[index] != "undefined";
+    return (typeof this._deck[index] != "undefined");
   },
 
   /**
-   * Indicates whether this card deck is empty or not.
+   * Returns the number of cards in the deck.
+   * @access public
    * @return {Boolean}
    */
   count: function() {
@@ -187,6 +181,7 @@ var CardDeck = Class.extend({
 
   /**
    * Returns the card at the specified index.
+   * @access public
    * @param {Number} index The card index.
    * @return {Boolean}
    * @throws {TypeError} If index is not a number.
@@ -195,7 +190,7 @@ var CardDeck = Class.extend({
   getAt: function(index) {
     index = new Number(index);
 
-    if (isNaN(index)) {
+    if (Number.isNaN(index)) {
       throw new TypeError("Invalid index type");
     } else if (index < 0 || index >= this._deck.length) {
       throw new RangeError("Index is out of range");
@@ -205,8 +200,9 @@ var CardDeck = Class.extend({
   },
 
   /**
-   * Removes and returns a sub deck from this deck between the specified
+   * Removes and returns a subdeck from the deck between the specified
    * fromIndex, inclusive, and toIndex, exclusive.
+   * @access public
    * @param {Number} fromIndex Start index (inclusive).
    * @param {Number} toIndex End index (exclusive).
    * @return {CardDeck}
@@ -217,32 +213,37 @@ var CardDeck = Class.extend({
   getSubDeck: function(fromIndex, toIndex) {
     fromIndex = new Number(fromIndex);
     toIndex = new Number(toIndex);
+    var subdeck;
 
-    if (isNaN(fromIndex) || isNaN(toIndex)) {
+    if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) {
       throw new TypeError("Invalid endpoint indices type");
-    } else if (fromIndex == toIndex) {
-      return new CardDeck();
     } else if (fromIndex > toIndex) {
       throw new Error("Endpoint indices are out of order");
     } else if (fromIndex < 0 || toIndex > this._deck.length) {
       throw new RangeError(
         "One/both of the endpoint indices value is out of range"
       );
+    } else if (fromIndex == toIndex) {
+      subdeck = new CardDeck();
     } else {
-      return new CardDeck(this._deck.splice(fromIndex, toIndex - fromIndex));
+      subdeck = new CardDeck(this._deck.splice(fromIndex, toIndex - fromIndex));
     }
+
+    return subdeck;
   },
 
   /**
-   * Indicates whether this card deck is empty or not.
+   * Indicates whether the card deck is empty or not.
+   * @access public
    * @return {Boolean}
    */
   isEmpty: function() {
-    return this._deck.length == 0;
+    return (this._deck.length == 0);
   },
 
   /**
    * Removes and returns the last card from the deck.
+   * @access public
    * @return {Card}
    */
   pop: function() {
@@ -251,6 +252,7 @@ var CardDeck = Class.extend({
 
   /**
    * Adds the specified card at the end of the deck.
+   * @access public
    * @param {Card} card The card to be added.
    * @return {Void}
    * @throws {TypeError} If card is not an instance of Card.
@@ -266,6 +268,7 @@ var CardDeck = Class.extend({
   /**
    * Merges the specified card deck at the end of the deck.
    * Merged cards are removed from the given deck.
+   * @access public
    * @param {CardDeck|Array} cards The cards to be added.
    * @return {Void}
    * @throws {TypeError} If cards is not an instance of CardDeck or Array.
@@ -286,6 +289,7 @@ var CardDeck = Class.extend({
 
   /**
    * Removes and returns the first card from the deck.
+   * @access public
    * @return {Card}
    */
   shift: function() {
@@ -293,7 +297,19 @@ var CardDeck = Class.extend({
   },
 
   /**
+   * Shuffles the card deck.
+   * @access public
+   * @return {Void}
+   */
+  shuffle: function() {
+    this._deck.sort(function() {
+      return 0.5 - Math.random();
+    });
+  },
+
+  /**
    * Adds the specified card at the beginning of the deck.
+   * @access public
    * @param {Card} card The card to be added.
    * @return {Void}
    * @throws {TypeError} If card is not an instance of Card.
@@ -309,6 +325,7 @@ var CardDeck = Class.extend({
   /**
    * Merges the specified card deck at the beginning of the deck.
    * Merged cards are removed from the given deck.
+   * @access public
    * @param {CardDeck|Array} cards The cards to be added.
    * @return {Void}
    * @throws {TypeError} If cards is not an instance of CardDeck or Array.
@@ -329,106 +346,77 @@ var CardDeck = Class.extend({
 
   /**
    * Returns the array representation of the card deck.
+   * @access public
    * @return {Array}
    */
   toArray: function() {
     return this._deck;
   },
 
+  /**
+   * Returns the DOM element representation of the card deck.
+   * @access public
+   * @return {DOMElement}
+   */
   toDOMElement: function() {
-    var column, index = 0;
-    column = document.createElement("div");
-    column.setAttribute("class", "column col-xs-6 col-sm-4");
+    var domElement, index;
 
-    while (index < this._deck.length) {
-      column.appendChild(this._deck[index].toDOMElement());
-      index++;
+    domElement = document.createElement("div");
+    domElement.setAttribute("class", "column col-xs-6 col-sm-4");
+
+    for (index in this._deck) {
+      domElement.appendChild(this._deck[index].toDOMElement());
     }
 
-    return column;
+    return domElement;
   },
 
   /**
-   * Returns the string representation of this card deck.
+   * Returns the string representation of the card deck.
+   * @access public
    * @return {String}
    */
   toString: function() {
     var deckString = "";
-    var cardIndex;
 
-    for (cardIndex in this._deck) {
-      if (this._deck[cardIndex] instanceof Card) {
-        deckString+= this._deck[cardIndex]+",";
+    for (var index in this._deck) {
+      if (this._deck[index] instanceof Card) {
+        deckString+= this._deck[index]+",";
       }
     }
 
     return deckString.slice(0, -1);
-  },
-
-  /**
-   * The CardDeck constructor.
-   * @param {Array} cards The initial cards of this deck.
-   * @return {CardDeck}
-   */
-  construct: function(cards) {
-    this._deck = new Array();
-
-    if (typeof cards != "undefined") {
-      try {
-        this.pushAll(cards);
-      } catch (error){};
-    }
   }
 });
 
 /**
- * Create random card deck.
+ * Creates a random card deck.
  * @static
  * @access public
  * @return {CardDeck}
  */
 CardDeck.createRandom = function() {
-  this.shuffle = function(inputArray) {
-    var oldArray = inputArray;
-    var newArray = new Array();
-    var key;
-
-    for (key in oldArray) {
-      if (oldArray.hasOwnProperty(key)) {
-        newArray.push(oldArray[key]);
-      }
-    }
-
-    newArray.sort(function(){
-      return 0.5 - Math.random();
-    });
-
-    return newArray;
-  };
-
   var deck = new CardDeck();
-  var cards = new Array();
-  var index;
 
-  for (index in CardValue) {
-    cards.push(new Card(CardType.CLUB, CardValue[index]));
-    cards.push(new Card(CardType.DIAMOND, CardValue[index]));
-    cards.push(new Card(CardType.HEART, CardValue[index]));
-    cards.push(new Card(CardType.SPADE, CardValue[index]));
+  for (var index in CardValue) {
+    deck.push(new Card(CardType.CLUB, CardValue[index]));
+    deck.push(new Card(CardType.DIAMOND, CardValue[index]));
+    deck.push(new Card(CardType.HEART, CardValue[index]));
+    deck.push(new Card(CardType.SPADE, CardValue[index]));
   }
 
-  deck.pushAll(this.shuffle(cards));
+  deck.shuffle();
 
   return deck;
 };
 
 /**
- * The one who does the magic...
+ * The one who does the "magic"...
  */
 var Tricker = Class.extend({
 
   /**
-   * Array of 3 cards subdeck (7 each).
+   * Array of 3 subdecks of the main deck, with 7 cards each.
    * @access private
    * @type {Array}
    */
@@ -441,19 +429,42 @@ var Tricker = Class.extend({
    */
   _deck: null,
 
+  /**
+   * The trick part.
+   * @access private
+   * @type {Number}
+   */
   _part: 0,
 
-  _selected: null,
+  /**
+   * The selected subdeck index (0, 1 or 2).
+   * @access private
+   * @type {Number}
+   */
+  _selected: -1,
 
   /**
-   * The "stage" (DOM element) where the trick is done.
+   * The "stage" (DOM element) where the trick is performed.
    * @access private
    * @type {DOMElement}
    */
   _stage: null,
 
   /**
-   * Conclude trick.
+   * The Tricker constructor.
+   * @access public
+   * @return {Tricker}
+   */
+  construct: function() {
+    this._deck = CardDeck.createRandom().getSubDeck(0, 21);
+    this._subdecks = new Array();
+    this._subdecks[0] = new CardDeck();
+    this._subdecks[1] = new CardDeck();
+    this._subdecks[2] = new CardDeck();
+  },
+
+  /**
+   * Concludes the trick.
    * @access public
    * @return {Void}
    */
@@ -467,49 +478,47 @@ var Tricker = Class.extend({
    * @return {Void}
    */
   deal: function() {
-    var cardIndex = 0;
-    var subdeckIndex = 0;
     var card;
     var subdeck;
-    var dir = 1;
+    var cardIndex = 0;
+    var subdeckIndex = 0;
+    var dealDirection = 1;
 
     while (!this._deck.isEmpty()) {
       if (subdeckIndex > 2) {
         subdeckIndex = 2;
-        dir = -1;
+        dealDirection = -1;
       } else if (subdeckIndex < 0) {
         subdeckIndex = 0;
-        dir = 1;
+        dealDirection = 1;
       }
 
       card = this._deck.pop();
       subdeck = this._subdecks[subdeckIndex];
       subdeck.push(card);
 
-      subdeckIndex+= dir;
+      subdeckIndex+= dealDirection;
       cardIndex++;
     }
   },
 
   /**
-    * Gather cards from the 3 separated subdecks into the main deck.
-    * @access public
-    * @param {Number} selected The selected subdeck index (0, 1 or 2).
-    * @return {Void}
-    */
+   * Gather cards from the 3 separated subdecks into the main deck.
+   * @access public
+   * @return {Void}
+   */
   gather: function() {
     var indices = [0, 1, 2];
     indices.splice(indices.indexOf(this._selected), 1);
 
     this._deck.pushAll(this._subdecks[this._selected]);
-    this._deck.unshiftAll(this._subdecks[indices[0]]);
     this._deck.pushAll(this._subdecks[indices[1]]);
+    this._deck.unshiftAll(this._subdecks[indices[0]]);
   },
 
   /**
-   * Perform trick.
+   * Performs the trick.
    * @access public
-   * @param {DOMElement} stage The "stage" for the trick (a DOM element).
    * @return {Void}
    */
   perform: function() {
@@ -529,26 +538,56 @@ var Tricker = Class.extend({
         this.conclude();
         this._part++;
         break;
+      default:
+        // Do chit chattery...
     }
-
-    this.show();
   },
 
+  /**
+   * Sets the selected subdeck.
+   * @access public
+   * @param {Number} selected The selected subdeck index (0, 1 or 2).
+   * @return {Void}
+   */
   setSelected: function(selected) {
     this._selected = parseInt(selected);
   },
 
+  /**
+   * Sets the stage.
+   * @access public
+   * @param {DOMElement} stage The "stage" (DOM element) to be set.
+   * @return {Void}
+   */
   setStage: function(stage) {
     this._stage = stage;
   },
 
+  /**
+   * Shows the current trick state (updates the HTML view).
+   * @access public
+   * @return {Void}
+   */
   show: function() {
-    this._stage.removeChild(stage.childNodes[0]);
+    this._stage.removeChild(this._stage.childNodes[0]);
     this._stage.appendChild(this.toDOMElement());
   },
 
+  /**
+   * Returns the DOM element representation of the tricker.
+   * @access public
+   * @return {DOMElement}
+   */
   toDOMElement: function() {
+    var $this = this;
     var table, row, columns;
+
+    // Column click event listener
+    function columnSelect(event) {
+      $this.setSelected(event.currentTarget.id);
+      $this.perform();
+      $this.show();
+    }
 
     table = document.createElement("div");
     table.setAttribute("class", "table");
@@ -557,53 +596,16 @@ var Tricker = Class.extend({
     row.setAttribute("class", "row");
 
     columns = new Array();
-    columns.push(this._subdecks[0].toDOMElement());
-    columns.push(this._subdecks[1].toDOMElement());
-    columns.push(this._subdecks[2].toDOMElement());
 
-    //Set column identifiers
-    columns[0].setAttribute("id", "0");
-    columns[1].setAttribute("id", "1");
-    columns[2].setAttribute("id", "2");
-
-    var self = this;
-
-    function columnSelect(event) {
-      self.setSelected(event.currentTarget.id);
-      self.perform();
+    for (var index in this._subdecks) {
+      columns.push(this._subdecks[index].toDOMElement());
+      columns[index].setAttribute("id", index);
+      columns[index].addEventListener("click", columnSelect);
+      row.appendChild(columns[index]);
     }
-
-    //Set column click events
-    columns[0].addEventListener("click", columnSelect);
-    columns[1].addEventListener("click", columnSelect);
-    columns[2].addEventListener("click", columnSelect);
-
-    row.appendChild(columns[0]);
-    row.appendChild(columns[1]);
-    row.appendChild(columns[2]);
 
     table.appendChild(row);
 
     return table;
-  },
-
-  /**
-   * Create a new Tricker instance.
-   * @return {Tricker}
-   */
-  construct: function() {
-    this._deck = CardDeck.createRandom().getSubDeck(0, 21);
-    this._subdecks = new Array();
-    this._subdecks[0] = new CardDeck();
-    this._subdecks[1] = new CardDeck();
-    this._subdecks[2] = new CardDeck();
   }
 });
-
-window.onload = function() {
-  var tricker, stage;
-  stage = document.getElementById("stage");
-  tricker = new Tricker();
-  tricker.setStage(stage);
-  tricker.perform();
-};

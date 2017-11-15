@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>JavaScript Cards Trick</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="styles/trick.css" />
+    <script type="text/javascript" src="scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="scripts/class.js"></script>
+    <script type="text/javascript" src="scripts/trick.js"></script>
+    <script type="text/javascript">
+    // Perform!
+    window.onload = function() {
+      var tricker, stage;
+
+      stage = document.getElementById("stage");
+      tricker = new Tricker();
+      tricker.setStage(stage);
+      tricker.perform();
+      tricker.show();
+    };
+    </script>
+  </head>
+  <body>
+    <div class="container center-block">
+      <h2 class="text-center">JavaScript Cards Trick</h2>
+      <div id="stage" class="trick"><!-- Tricker Stage --></div>
+    </div>
+  </body>
+</html>

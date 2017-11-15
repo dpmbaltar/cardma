@@ -1,6 +1,6 @@
 /**
- * JavaScript Card Trick Styles
- * By Diego P. M. Baltar http://dpmbaltar.com.ar/
+ * JavaScript Cards Trick - Styles
+ * By Diego P. M. Baltar <dpmbaltar@gmail.com>
  */
 body {
 	background: #222;
@@ -82,7 +82,7 @@ body {
 .trick .card.club.queen { background-position: -1100px 0 }
 .trick .card.club.king { background-position: -1200px 0 }
 
-/* Hearts Cards */
+/* Heart Cards */
 .trick .card.heart.ace { background-position: 0 -140px }
 .trick .card.heart.two { background-position: -100px -140px }
 .trick .card.heart.three { background-position: -200px -140px }
@@ -97,7 +97,7 @@ body {
 .trick .card.heart.queen { background-position: -1100px -140px }
 .trick .card.heart.king { background-position: -1200px -140px }
 
-/* Spades Cards */
+/* Spade Cards */
 .trick .card.spade.ace { background-position: 0 -280px }
 .trick .card.spade.two { background-position: -100px -280px }
 .trick .card.spade.three { background-position: -200px -280px }
@@ -112,7 +112,7 @@ body {
 .trick .card.spade.queen { background-position: -1100px -280px }
 .trick .card.spade.king { background-position: -1200px -280px }
 
-/* Diamonds Cards */
+/* Diamond Cards */
 .trick .card.diamond.ace { background-position: 0 -420px }
 .trick .card.diamond.two { background-position: -100px -420px }
 .trick .card.diamond.three { background-position: -200px -420px }
